@@ -10,6 +10,7 @@ provides=('happ')
 conflicts=('happ')
 source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/releases/download/${pkgver}/Happ.linux.x64.deb")
 sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
+# Binaries are prebuilt; avoid stripping to prevent breaking shipped artifacts.
 options=(!strip)
 
 package() {
@@ -17,8 +18,15 @@ package() {
 
   local data_archive
   data_archive="$(find "${srcdir}" -maxdepth 1 -name 'data.tar.*' -print -quit)"
-  [[ -n "${data_archive}" ]] || return 1
-  bsdtar -xf "${data_archive}" -C "${pkgdir}"
+  if [[ -z "${data_archive}" ]]; then
+    echo "Data archive not found in downloaded package"
+    return 1
+  fi
+
+  if ! bsdtar -xf "${data_archive}" -C "${pkgdir}"; then
+    echo "Failed to extract data archive ${data_archive}"
+    return 1
+  fi
 
   install -d "${pkgdir}/usr/share/licenses/${pkgname}"
 
