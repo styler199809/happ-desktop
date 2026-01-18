@@ -8,15 +8,19 @@ license=('custom')
 depends=('openssl' 'glibc' 'systemd')
 provides=('happ')
 conflicts=('happ')
-source=("https://github.com/Happ-proxy/happ-desktop/releases/download/${pkgver}/Happ.linux.x64.deb")
+source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/releases/download/${pkgver}/Happ.linux.x64.deb")
 sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
 options=(!strip)
 
 package() {
-  bsdtar -xf "${srcdir}/Happ.linux.x64.deb" -C "${srcdir}"
+  bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}"
   bsdtar -xf "${srcdir}/data.tar.zst" -C "${pkgdir}"
 
   install -d "${pkgdir}/usr/share/licenses/${pkgname}"
-  install -m644 "${pkgdir}/opt/happ/bin/core/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core"
-  install -m644 "${pkgdir}/opt/happ/bin/tun/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun"
+
+  local core_license="${pkgdir}/opt/happ/bin/core/LICENSE"
+  local tun_license="${pkgdir}/opt/happ/bin/tun/LICENSE"
+
+  [[ -f "${core_license}" ]] && install -m644 "${core_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core"
+  [[ -f "${tun_license}" ]] && install -m644 "${tun_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun"
 }
