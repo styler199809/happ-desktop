@@ -1,4 +1,5 @@
 # Maintainer: Your Name <your.email@example.com>
+# NOTE: Please update maintainer information before submitting to AUR
 pkgname=happ-desktop
 pkgver=1.5.2
 pkgrel=1
@@ -12,6 +13,7 @@ optdepends=(
     'libappindicator-gtk3: for system tray icon support'
 )
 source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/releases/download/v${pkgver}/Happ.linux.x64.deb")
+# NOTE: Run 'makepkg -g' to generate the correct sha256sum
 sha256sums=('SKIP')
 noextract=("${pkgname}-${pkgver}.deb")
 
