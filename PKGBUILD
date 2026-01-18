@@ -16,14 +16,16 @@ source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/re
 sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
 
 package() {
-    # Extract the deb package
+    # Extract the deb package (ar extracts the .deb, then bsdtar extracts data.tar.*)
+    cd "${srcdir}"
+    bsdtar -xf "${pkgname}-${pkgver}.deb"
     bsdtar -xf data.tar.* -C "${pkgdir}/"
     
     # Fix permissions
     chmod -R g-w "${pkgdir}"
     
     # Install license file if present
-    if [[ -d "${pkgdir}/usr/share/doc/happ" ]]; then
-        install -Dm644 "${pkgdir}/usr/share/doc/happ/copyright" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" 2>/dev/null || true
+    if [[ -f "${pkgdir}/usr/share/doc/happ/copyright" ]]; then
+        install -Dm644 "${pkgdir}/usr/share/doc/happ/copyright" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     fi
 }
