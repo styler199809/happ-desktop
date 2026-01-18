@@ -13,8 +13,12 @@ sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
 options=(!strip)
 
 package() {
-  bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}" || return 1
-  bsdtar -xf "${srcdir}/data.tar.zst" -C "${pkgdir}" || return 1
+  bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}"
+
+  local data_archive
+  data_archive="$(find "${srcdir}" -maxdepth 1 -name 'data.tar.*' -print -quit)"
+  [[ -n "${data_archive}" ]] || return 1
+  bsdtar -xf "${data_archive}" -C "${pkgdir}"
 
   install -d "${pkgdir}/usr/share/licenses/${pkgname}"
 
