@@ -18,7 +18,7 @@ package() {
   bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}"
 
   local data_archive
-  data_archive="$(find "${srcdir}" -maxdepth 1 -type f -regextype posix-extended -regex '.*/data\\.tar\\.(gz|xz|zst|bz2|lzma)' -print -quit)"
+  data_archive="$(find "${srcdir}" -maxdepth 1 -type f -regextype posix-extended -regex '.*/data\.tar\.(gz|xz|zst|bz2|lzma)' -print -quit)"
   if [[ -z "${data_archive}" ]]; then
     error "Data archive not found in downloaded package. This may indicate a corrupted download or unsupported package format."
     return 1
