@@ -20,7 +20,12 @@ package() {
 
   local data_archive
   data_archive="$(find "${srcdir}" -maxdepth 1 -type f -name 'data.tar.*' -print -quit)"
-  if [[ -z "${data_archive}" || ! "${data_archive}" =~ data\.tar\.(gz|xz|zst|bz2|lzma)$ ]]; then
+  if [[ -z "${data_archive}" ]]; then
+    error "Data archive not found in downloaded package. This may indicate a corrupted download or unsupported package format."
+    return 1
+  fi
+
+  if [[ ! ${data_archive} =~ data\.tar\.(gz|xz|zst|bz2|lzma)$ ]]; then
     error "Data archive not found in downloaded package. This may indicate a corrupted download or unsupported package format."
     return 1
   fi
@@ -30,7 +35,10 @@ package() {
     return 1
   fi
 
-  install -d "${pkgdir}/usr/share/licenses/${pkgname}"
+  if ! install -d "${pkgdir}/usr/share/licenses/${pkgname}"; then
+    error "Failed to create license directory"
+    return 1
+  fi
 
   local core_license="${pkgdir}/opt/happ/bin/core/LICENSE"
   local tun_license="${pkgdir}/opt/happ/bin/tun/LICENSE"
