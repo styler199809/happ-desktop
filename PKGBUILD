@@ -9,7 +9,7 @@ depends=('openssl')
 optdepends=('systemd: manage the bundled happd service')
 provides=('happ')
 conflicts=('happ')
-source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/releases/download/${pkgver}/Happ.linux.x64.deb")
+source=("${pkgname}-${pkgver}.deb::${url}/releases/download/${pkgver}/Happ.linux.x64.deb")
 sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
 # Binaries are prebuilt; avoid stripping to prevent breaking shipped artifacts.
 options=(!strip)
@@ -18,9 +18,9 @@ package() {
   bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}"
 
   local data_archive
-  data_archive="$(find "${srcdir}" -maxdepth 1 -type f -regextype posix-extended -regex '.*/data\\.tar\\.(gz|xz|zst|bz2)' -print -quit)"
+  data_archive="$(find "${srcdir}" -maxdepth 1 -type f -regextype posix-extended -regex '.*/data\\.tar\\.(gz|xz|zst|bz2|lzma)' -print -quit)"
   if [[ -z "${data_archive}" ]]; then
-    error "Data archive not found in downloaded package"
+    error "Data archive not found in downloaded package. This may indicate a corrupted download or unsupported package format."
     return 1
   fi
 
@@ -35,10 +35,16 @@ package() {
   local tun_license="${pkgdir}/opt/happ/bin/tun/LICENSE"
 
   if [[ -f "${core_license}" ]]; then
-    install -m644 "${core_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core" || return 1
+    if ! install -m644 "${core_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core"; then
+      error "Failed to install core license file"
+      return 1
+    fi
   fi
 
   if [[ -f "${tun_license}" ]]; then
-    install -m644 "${tun_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun" || return 1
+    if ! install -m644 "${tun_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun"; then
+      error "Failed to install tun license file"
+      return 1
+    fi
   fi
 }
