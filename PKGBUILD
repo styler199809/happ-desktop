@@ -14,16 +14,10 @@ source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/re
 sha256sums=('05f4328c711aee061c6e702f5a1ef1c6ef18181774129a59e3b41212682b0d74')
 
 package() {
-    # Extract the .deb package
+    # Extract the .deb package (preserves original permissions)
     bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb"
     bsdtar -xf data.tar.zst -C "${pkgdir}"
     
-    # Create necessary directories if they don't exist
-    install -dm755 "${pkgdir}/usr/bin"
-    
-    # Create symlink to main executable
-    ln -s /opt/happ/bin/Happ "${pkgdir}/usr/bin/happ"
-    
-    # Ensure correct permissions for all executables in bin directory and subdirectories
-    find "${pkgdir}/opt/happ/bin" -type f -exec chmod +x {} +
+    # Note: The symlink from /usr/bin/happ to /opt/happ/bin/Happ is already
+    # included in the .deb package, so no additional setup is needed
 }
