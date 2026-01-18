@@ -14,9 +14,13 @@ source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/re
 sha256sums=('05f4328c711aee061c6e702f5a1ef1c6ef18181774129a59e3b41212682b0d74')
 
 package() {
+    cd "${srcdir}"
+    
     # Extract the .deb package (preserves original permissions)
-    bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb"
-    bsdtar -xf data.tar.zst -C "${pkgdir}"
+    bsdtar -xf "${pkgname}-${pkgver}.deb"
+    
+    # Extract the data archive (supports different compression formats)
+    bsdtar -xf data.tar.* -C "${pkgdir}"
     
     # Note: The symlink from /usr/bin/happ to /opt/happ/bin/Happ is already
     # included in the .deb package, so no additional setup is needed
