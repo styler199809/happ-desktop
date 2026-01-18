@@ -18,7 +18,7 @@ package() {
   bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" -C "${srcdir}"
 
   local data_archive
-  data_archive="$(find "${srcdir}" -maxdepth 1 -name 'data.tar.*' -print -quit)"
+  data_archive="$(find "${srcdir}" -maxdepth 1 -type f -regextype posix-extended -regex '.*/data\\.tar\\.(gz|xz|zst|bz2)' -print -quit)"
   if [[ -z "${data_archive}" ]]; then
     error "Data archive not found in downloaded package"
     return 1
@@ -34,6 +34,11 @@ package() {
   local core_license="${pkgdir}/opt/happ/bin/core/LICENSE"
   local tun_license="${pkgdir}/opt/happ/bin/tun/LICENSE"
 
-  [[ -f "${core_license}" ]] && install -m644 "${core_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core"
-  [[ -f "${tun_license}" ]] && install -m644 "${tun_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun"
+  if [[ -f "${core_license}" ]]; then
+    install -m644 "${core_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.core" || return 1
+  fi
+
+  if [[ -f "${tun_license}" ]]; then
+    install -m644 "${tun_license}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.tun" || return 1
+  fi
 }
