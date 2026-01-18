@@ -16,10 +16,18 @@ source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/re
 sha256sums=('305bf4439fb79a3e1ff09602d38f577bdd1f929c5ce4838dd89dade6e27da2c7')
 
 package() {
-    # Extract the deb package (ar extracts the .deb, then bsdtar extracts data.tar.*)
+    # Extract the deb package contents
     cd "${srcdir}"
     bsdtar -xf "${pkgname}-${pkgver}.deb"
-    bsdtar -xf data.tar.* -C "${pkgdir}/"
+    
+    # Find and extract the data tarball (handles data.tar.gz, data.tar.xz, data.tar.zst, etc.)
+    local data_tar
+    data_tar=$(ls data.tar.* 2>/dev/null | head -n1)
+    if [[ -z "${data_tar}" ]]; then
+        error "Could not find data.tar.* in the .deb package"
+        return 1
+    fi
+    bsdtar -xf "${data_tar}" -C "${pkgdir}/"
     
     # Fix permissions
     chmod -R g-w "${pkgdir}"
