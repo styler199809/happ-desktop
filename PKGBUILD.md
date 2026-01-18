@@ -12,7 +12,7 @@ To build and install the package:
 
 ```bash
 # Clone this repository
-git clone https://github.com/styler199809/happ-desktop.git
+git clone https://github.com/Happ-proxy/happ-desktop.git
 cd happ-desktop
 
 # Build the package
