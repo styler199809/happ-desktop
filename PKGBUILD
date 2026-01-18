@@ -5,7 +5,8 @@ pkgdesc="Happ proxy utility desktop client (prebuilt binary)"
 arch=('x86_64')
 url="https://github.com/Happ-proxy/happ-desktop"
 license=('custom')
-depends=('openssl' 'systemd')
+depends=('openssl')
+optdepends=('systemd: manage the bundled happd service')
 provides=('happ')
 conflicts=('happ')
 source=("${pkgname}-${pkgver}.deb::https://github.com/Happ-proxy/happ-desktop/releases/download/${pkgver}/Happ.linux.x64.deb")
@@ -19,12 +20,12 @@ package() {
   local data_archive
   data_archive="$(find "${srcdir}" -maxdepth 1 -name 'data.tar.*' -print -quit)"
   if [[ -z "${data_archive}" ]]; then
-    echo "Data archive not found in downloaded package"
+    error "Data archive not found in downloaded package"
     return 1
   fi
 
   if ! bsdtar -xf "${data_archive}" -C "${pkgdir}"; then
-    echo "Failed to extract data archive ${data_archive}"
+    error "Failed to extract data archive: ${data_archive}"
     return 1
   fi
 
